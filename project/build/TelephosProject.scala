@@ -12,10 +12,10 @@ class TelephosProject(info: ProjectInfo) extends DefaultProject(info) {
 
   def thriftTask(tpe: String, directory: Path, thriftFile: Path) = {
     val cleanIt = cleanTask(directory) named("clean-thrift-" + tpe)
-    val mkdir   = execTask { <x>mkdir {directory.absolutePath}</x> }
+    val mkdir   = execTask { <x>mkdir {directory.absolutePath}</x> } named("mk-thrift-dir") dependsOn(cleanIt)
     execTask {
       <x>thrift --gen {tpe} -o {directory.absolutePath} {thriftFile.absolutePath}</x>
-    } dependsOn(cleanIt, mkdir)
+    } dependsOn(mkdir)
   }
 
   lazy val thriftJava = thriftTask("java", javaDirectoryPath, thriftFile) describedAs("Build Thift Java")
