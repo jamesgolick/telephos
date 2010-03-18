@@ -17,15 +17,11 @@ import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
 
-class Cassandra {
-  val socket    = new TSocket("localhost", 9160)
-  val protocol  = new TBinaryProtocol(socket)
-  val client    = new TCassandra.Client(protocol)
-  
-  socket.open
-
-  def insert(keyspace: String, batch: Batch) = {
-    //client.batch_mutate(keyspace, batch.toThrift, 1)
+class Cassandra(val keyspace: String,
+                client:       TCassandra.Client,
+                converter:    Converter) {
+  def insert(batch: Batch) = {
+    client.batch_mutate(keyspace, converter.toMutationMap(batch), 1)
   }
 
   //def get(keyspace: String, columnPath: ColumnPath) = {

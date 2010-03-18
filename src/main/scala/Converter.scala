@@ -1,4 +1,4 @@
-package com.protose.telephos.spec
+package com.protose.telephos
 
 import java.util.{Map => JMap}
 import java.util.{HashMap => JHashMap}
