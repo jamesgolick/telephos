@@ -9,10 +9,16 @@ import org.apache.cassandra.thrift.Column
 import org.apache.cassandra.thrift.ColumnParent
 import org.apache.cassandra.thrift.ColumnOrSuperColumn
 import org.apache.cassandra.thrift.KeyRange
+import org.apache.cassandra.thrift.KeySlice
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
 import org.apache.cassandra.thrift.SuperColumn
+
+import org.scala_tools.javautils.Imports._
+
+import scala.collection.SortedMap
+import scala.collection.immutable.TreeMap
 
 import Tap._
 
@@ -37,6 +43,20 @@ class Converter {
       cfMap.add(mutation)
     }
     map
+  }
+
+  def toSortedMap[A <: Ordered[A], B](keySlices: JList[KeySlice]):
+    SortedMap[A, B] = {
+    val newMap = Map[A, B]()
+    val map    = keySlices.get(0).columns.asScala.foldLeft(newMap) { 
+      (map, colOrSuper) =>
+      val col      = colOrSuper.column
+      val name: A  = col.name.asInstanceOf[A]
+      val value: B = col.value.asInstanceOf[B]
+
+      map + (name -> value)
+    }
+    new TreeMap[A, B]() ++ map
   }
 
   def makeColumnParent(columnFamily: String) = {

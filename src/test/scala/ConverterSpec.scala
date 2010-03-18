@@ -2,12 +2,19 @@ package com.protose.telephos.spec
 
 import java.util.{Map => JMap}
 import java.util.{List => JList}
+import java.util.{ArrayList => JArrayList}
 
+import org.apache.cassandra.thrift.Column
+import org.apache.cassandra.thrift.ColumnOrSuperColumn
 import org.apache.cassandra.thrift.ColumnParent
 import org.apache.cassandra.thrift.KeyRange
+import org.apache.cassandra.thrift.KeySlice
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
+
+import scala.collection.SortedMap
+import Tap._
 
 import org.specs.Specification
 import org.specs.mock.Mockito
@@ -88,4 +95,5 @@ object ConverterSpec extends Specification with Mockito {
       keyRange.end_key must_== "1"
     }
   }
+
 }
