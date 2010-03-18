@@ -50,20 +50,4 @@ class Cassandra(val keyspace: String,
   def get(columnFamily: String, key: String): JList[KeySlice] = {
     get(columnFamily, key, false, 100)
   }
-
-  //def get(keyspace: String, .speccolumnPath: ColumnPath) = {
-  //  val parent            = new ColumnParent
-  //  parent.column_family  = columnPath.columnFamily
-
-  //  val sliceRange        = new SliceRange("".getBytes, "".getBytes, false, 100)
-  //  val predicate         = new SlicePredicate
-  //  predicate.slice_range = sliceRange
-
-  //  val keyRange          = new KeyRange
-  //  keyRange.start_key    = columnPath.key
-  //  keyRange.end_key      = columnPath.key
-  //  keyRange.count        = 1
-
-  //  client.get_range_slices(keyspace, parent, predicate, keyRange, 1)
-  //}
 }
