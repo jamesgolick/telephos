@@ -18,7 +18,7 @@ import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
 
 object Cassandra {
-  def apply(keyspace: String) {
+  def apply(keyspace: String): Cassandra = {
     val socket    = new TSocket("localhost", 9160)
     val protocol  = new TBinaryProtocol(socket)
     val client    = new TCassandra.Client(protocol)
@@ -37,6 +37,13 @@ class Cassandra(val keyspace: String,
     client.batch_mutate(keyspace, converter.toMutationMap(batch), 1)
   }
 
+  def get(columnFamily: String, key: String, reversed: Boolean, limit: Int) = {
+    val parent    = converter.makeColumnParent(columnFamily)
+    val predicate = converter.makeSlicePredicate(reversed, limit)
+    val keyRange  = converter.makeKeyRange(key)
+
+    client.get_range_slices(keyspace, parent, predicate, keyRange, 1)
+  }
   //def get(keyspace: String, .speccolumnPath: ColumnPath) = {
   //  val parent            = new ColumnParent
   //  parent.column_family  = columnPath.columnFamily
