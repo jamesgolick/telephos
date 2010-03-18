@@ -28,7 +28,7 @@ class Converter {
 
       val cfMap    = keyMap.get(m.columnFamily)
       val mutation = new TMutation().tap {
-        tm => tm.column_or_super_column = toColumnOrSupercolumn(m)
+        tm => tm.column_or_supercolumn = toColumnOrSuperColumn(m)
       }
 
       cfMap.add(mutation)
