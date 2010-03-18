@@ -36,15 +36,30 @@ object CassandraSpec extends Specification with Mockito {
     val slicePredicate = mock[SlicePredicate]
     val keyRange       = mock[KeyRange]
 
-    converter.makeColumnParent("Users") returns columnParent
-    converter.makeSlicePredicate(false, 10) returns slicePredicate
-    converter.makeKeyRange("1") returns keyRange
+    "with all the options specified" in {
+      converter.makeColumnParent("Users") returns columnParent
+      converter.makeSlicePredicate(false, 10) returns slicePredicate
+      converter.makeKeyRange("1") returns keyRange
 
-    cassandra.get("Users", "1", false, 10)
+      cassandra.get("Users", "1", false, 10)
 
-    "converts to thrift data types and queries thrift" in {
-      client.get_range_slices(keyspace, columnParent,
-                              slicePredicate, keyRange, 1) was called
+      "converts to thrift data types and queries thrift" in {
+        client.get_range_slices(keyspace, columnParent,
+          slicePredicate, keyRange, 1) was called
+      }
+    }
+
+    "with only the cf and key specified" in {
+      converter.makeColumnParent("Users") returns columnParent
+      converter.makeSlicePredicate(false, 100) returns slicePredicate
+      converter.makeKeyRange("1") returns keyRange
+
+      cassandra.get("Users", "1")
+
+      "converts to thrift data types and queries thrift" in {
+        client.get_range_slices(keyspace, columnParent,
+          slicePredicate, keyRange, 1) was called
+      }
     }
   }
 }
