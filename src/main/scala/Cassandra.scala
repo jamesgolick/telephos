@@ -54,34 +54,6 @@ class Batch(val mutations: List[Mutation]) {
              this
   }
 
-//  def toThrift: JMap[String, JMap[String, JList[TMutation]]] = {
-//    val map = new JHashMap[String, JMap[String, JList[TMutation]]]()
-//    mutations.foreach { m =>
-//      val key          = m.columnPath.key
-//      val columnFamily = m.columnPath.columnFamily
-
-//      if (map.get(key) == null) {
-//        map.put(key, new JHashMap[String, JList[TMutation]]())
-//      }
-
-//      val keyMap = map.get(key)
-//      if (keyMap.get(columnFamily) == null) {
-//        keyMap.put(columnFamily, new JArrayList[TMutation]())
-//      }
-
-//      val cfMap    = keyMap.get(columnFamily)
-//      val mutation = new TMutation
-//      val column   = new Column
-//      column.name  = m.columnPath.column
-//      column.value = m.value
-
-//      val columnOrSuperColumn        = new ColumnOrSuperColumn
-//      columnOrSuperColumn.column     = column
-//      mutation.column_or_supercolumn = columnOrSuperColumn
-//      cfMap.add(mutation)
-//    }
-//    map
-//  }
 }
 
 object Cassandra {

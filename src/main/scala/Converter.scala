@@ -11,22 +11,25 @@ import org.apache.cassandra.thrift.ColumnOrSuperColumn
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SuperColumn
 
+import Tap._
+
 class Converter {
   def toMutationMap(batch: Batch): JMap[String, JMap[String, JList[TMutation]]] = {
     val map = new JHashMap[String, JMap[String, JList[TMutation]]]()
     batch.mutations.foreach { m =>
-      if (map.get(m.key) == null) {
+      if (!map.containsKey(m.key)) {
         map.put(m.key, new JHashMap[String, JList[TMutation]]())
       }
 
       val keyMap = map.get(m.key)
-        if (keyMap.get(m.columnFamily) == null) {
+      if (!keyMap.containsKey(m.columnFamily)) {
         keyMap.put(m.columnFamily, new JArrayList[TMutation]())
       }
 
-      val cfMap                      = keyMap.get(m.columnFamily)
-      val mutation                   = new TMutation
-      mutation.column_or_supercolumn = toColumnOrSuperColumn(m)
+      val cfMap    = keyMap.get(m.columnFamily)
+      val mutation = new TMutation().tap {
+        tm => tm.column_or_super_column = toColumnOrSupercolumn(m)
+      }
 
       cfMap.add(mutation)
     }
@@ -41,24 +44,19 @@ class Converter {
   }
 
   protected def toColumn(mutation: Mutation) = {
-    val column   = new Column
-    column.name  = mutation.column
-    column.value = mutation.value
-
-    val columnOrSuperColumn    = new ColumnOrSuperColumn
-    columnOrSuperColumn.column = column
-    columnOrSuperColumn
+    new ColumnOrSuperColumn().tap { c => c.column = toTColumn(mutation) }
   }
 
   protected def toSuperColumn(mutation: Mutation) = {
-    val column     = new SuperColumn
-    column.name    = mutation.superColumn
-    column.columns = new JArrayList[Column]
-    val col        = new Column(mutation.column, mutation.value, mutation.timestamp)
-    column.columns.add(col)
+    val superCol = new SuperColumn().tap { c => 
+      c.name     = mutation.superColumn
+      c.columns  = new JArrayList[Column]().tap { l => l.add(toTColumn(mutation)) }
+    }
 
-    val columnOrSuperColumn    = new ColumnOrSuperColumn
-    columnOrSuperColumn.super_column = column
-    columnOrSuperColumn
+    new ColumnOrSuperColumn().tap { c => c.super_column = superCol }
+  }
+
+  protected def toTColumn(mutation: Mutation) = {
+    new Column(mutation.column, mutation.value, mutation.timestamp)
   }
 }
