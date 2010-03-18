@@ -9,6 +9,8 @@ import org.apache.cassandra.thrift.Column
 import org.apache.cassandra.thrift.ColumnParent
 import org.apache.cassandra.thrift.ColumnOrSuperColumn
 import org.apache.cassandra.thrift.{Mutation => TMutation}
+import org.apache.cassandra.thrift.SlicePredicate
+import org.apache.cassandra.thrift.SliceRange
 import org.apache.cassandra.thrift.SuperColumn
 
 import Tap._
@@ -34,6 +36,21 @@ class Converter {
       cfMap.add(mutation)
     }
     map
+  }
+
+  def makeColumnParent(columnFamily: String) = {
+    new ColumnParent().tap { c => c.column_family = columnFamily }
+  }
+
+  def makeSlicePredicate(reversed: Boolean, count: Int): SlicePredicate = {
+    new SlicePredicate().tap { sp =>
+      sp.slice_range = makeSliceRange("".getBytes, "".getBytes, reversed, count)
+    }
+  }
+
+  def makeSliceRange(start: Array[Byte], finish: Array[Byte],
+                     reversed: Boolean, count: Int): SliceRange = {
+    new SliceRange(start, finish, reversed, count)
   }
 
   protected def toColumnOrSuperColumn(mutation: Mutation) = {

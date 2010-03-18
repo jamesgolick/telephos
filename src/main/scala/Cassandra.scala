@@ -32,6 +32,7 @@ object Cassandra {
 class Cassandra(val keyspace: String,
                 client:       TCassandra.Client,
                 converter:    Converter) {
+
   def insert(batch: Batch) = {
     client.batch_mutate(keyspace, converter.toMutationMap(batch), 1)
   }
