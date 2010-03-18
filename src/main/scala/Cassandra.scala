@@ -1,6 +1,5 @@
 package com.protose.telephos
 
-import java.util.Date
 import java.util.{Map => JMap}
 import java.util.{HashMap => JHashMap}
 import java.util.{List => JList}
@@ -17,32 +16,6 @@ import org.apache.cassandra.thrift.KeyRange
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
-
-object Mutation {
-  def apply(columnFamily: String, 
-            key:          String,
-            superColumn:  String,
-            column:       String,
-            value:        String,
-            timestamp:    Long) = {
-    new Mutation(columnFamily, key, superColumn.getBytes,
-                 column.getBytes, value.getBytes, timestamp)
-  }
-
-  def apply(columnFamily: String, 
-            key:          String,
-            column:       String,
-            value:        String,
-            timestamp:    Long) = {
-    new Mutation(columnFamily, key, null, column.getBytes, value.getBytes, timestamp)
-  }
-}
-case class Mutation(columnFamily: String, 
-                    key:          String,
-                    superColumn:  Array[Byte],
-                    column:       Array[Byte],
-                    value:        Array[Byte],
-                    timestamp:    Long)
 
 
 class Batch(val mutations: List[Mutation]) {
