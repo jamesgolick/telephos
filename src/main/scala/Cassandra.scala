@@ -17,24 +17,7 @@ import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
 
-
-class Batch(val mutations: List[Mutation]) {
-  def this() = this(List[Mutation]())
-
-  def insert(columnFamily: String,
-             key:          String, 
-             columns:      Map[String, String]): Batch = {
-             this
-  }
-
-}
-
-object Cassandra {
-}
-
 class Cassandra {
-  import Cassandra._
-
   val socket    = new TSocket("localhost", 9160)
   val protocol  = new TBinaryProtocol(socket)
   val client    = new TCassandra.Client(protocol)
