@@ -4,6 +4,7 @@ import java.util.{Map => JMap}
 import java.util.{List => JList}
 
 import org.apache.cassandra.thrift.ColumnParent
+import org.apache.cassandra.thrift.KeyRange
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
@@ -73,6 +74,18 @@ object ConverterSpec extends Specification with Mockito {
 
     "sets the count parameter" in {
       sliceRange.count must_== 5
+    }
+  }
+
+  "creating a key range with a single key" in {
+    val keyRange: KeyRange = converter.makeKeyRange("1")
+
+    "it has a start_key of key" in {
+      keyRange.start_key must_== "1"
+    }
+
+    "it has a end_key of key" in {
+      keyRange.end_key must_== "1"
     }
   }
 }

@@ -8,6 +8,7 @@ import java.util.{ArrayList => JArrayList}
 import org.apache.cassandra.thrift.Column
 import org.apache.cassandra.thrift.ColumnParent
 import org.apache.cassandra.thrift.ColumnOrSuperColumn
+import org.apache.cassandra.thrift.KeyRange
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
@@ -51,6 +52,13 @@ class Converter {
   def makeSliceRange(start: Array[Byte], finish: Array[Byte],
                      reversed: Boolean, count: Int): SliceRange = {
     new SliceRange(start, finish, reversed, count)
+  }
+
+  def makeKeyRange(start: String): KeyRange = {
+    new KeyRange().tap { range =>
+      range.start_key = start
+      range.end_key   = start
+    }
   }
 
   protected def toColumnOrSuperColumn(mutation: Mutation) = {
