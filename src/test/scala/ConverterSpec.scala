@@ -13,7 +13,6 @@ import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
 
-import scala.collection.SortedMap
 import Tap._
 
 import org.specs.Specification
@@ -96,4 +95,31 @@ object ConverterSpec extends Specification with Mockito {
     }
   }
 
+  "converting a java list of keyslices in to a sorted map of columns" in {
+    val name1   = "name".getBytes
+    val value1  = "value".getBytes
+    val name2   = "name2".getBytes
+    val value2  = "value2".getBytes
+
+    val columns  = new JArrayList[ColumnOrSuperColumn]().tap { cols =>
+      cols.add(new ColumnOrSuperColumn().tap { cos =>
+        cos setColumn new Column(name1, value1, 12345)
+      })
+
+      cols.add(new ColumnOrSuperColumn().tap { cos =>
+        cos setColumn new Column(name2, value2, 12345)
+      })
+    }
+    val keySlice = mock[KeySlice]
+    val slices   = new JArrayList[KeySlice]().tap { l => l.add(keySlice) }
+
+    keySlice.getColumns returns columns
+
+    val map = converter.toMap(slices)
+
+    "converts the structure into a sorted map" in {
+      map(name1) must_== value1
+      map(name2) must_== value2
+    }
+  }
 }

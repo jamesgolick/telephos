@@ -17,9 +17,6 @@ import org.apache.cassandra.thrift.SuperColumn
 
 import org.scala_tools.javautils.Imports._
 
-import scala.collection.SortedMap
-import scala.collection.immutable.TreeMap
-
 import Tap._
 
 class Converter {
@@ -45,14 +42,13 @@ class Converter {
     map
   }
 
-  def toSortedMap[A <: Ordered[A], B](keySlices: JList[KeySlice]): SortedMap[A, B] ={
-    val columns = keySlices.get(0).columns.asScala
-    val map     = columns.foldLeft(Map[A, B]()) { (map, colOrSuper) =>
-      val col   = colOrSuper.column
+  def toMap(keySlices: JList[KeySlice]): Map[Array[Byte], Array[Byte]] = {
+    val columns = keySlices.get(0).getColumns.asScala
+    columns.foldLeft(Map[Array[Byte], Array[Byte]]()) { (map, colOrSuper) =>
+      val col = colOrSuper.column
 
-      map + (col.name.asInstanceOf[A] -> col.value.asInstanceOf[B])
+      map + (col.name -> col.value)
     }
-    new TreeMap[A, B]() ++ map
   }
 
   def makeColumnParent(columnFamily: String) = {
