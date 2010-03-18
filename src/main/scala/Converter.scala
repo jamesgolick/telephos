@@ -45,16 +45,12 @@ class Converter {
     map
   }
 
-  def toSortedMap[A <: Ordered[A], B](keySlices: JList[KeySlice]):
-    SortedMap[A, B] = {
-    val newMap = Map[A, B]()
-    val map    = keySlices.get(0).columns.asScala.foldLeft(newMap) { 
-      (map, colOrSuper) =>
-      val col      = colOrSuper.column
-      val name: A  = col.name.asInstanceOf[A]
-      val value: B = col.value.asInstanceOf[B]
+  def toSortedMap[A <: Ordered[A], B](keySlices: JList[KeySlice]): SortedMap[A, B] ={
+    val columns = keySlices.get(0).columns.asScala
+    val map     = columns.foldLeft(Map[A, B]()) { (map, colOrSuper) =>
+      val col   = colOrSuper.column
 
-      map + (name -> value)
+      map + (col.name.asInstanceOf[A] -> col.value.asInstanceOf[B])
     }
     new TreeMap[A, B]() ++ map
   }
