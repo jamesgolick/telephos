@@ -10,6 +10,7 @@ import java.util.{List => JList}
 import org.apache.cassandra.thrift.{Cassandra => TCassandra}
 import org.apache.cassandra.thrift.ColumnParent
 import org.apache.cassandra.thrift.KeyRange
+import org.apache.cassandra.thrift.KeySlice
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 
@@ -35,17 +36,26 @@ object CassandraSpec extends Specification with Mockito {
     val columnParent   = mock[ColumnParent]
     val slicePredicate = mock[SlicePredicate]
     val keyRange       = mock[KeyRange]
+    val keySlices      = mock[JList[KeySlice]]
+    val map            = mock[Map[Array[Byte], Array[Byte]]]
+
+    client.get_range_slices(keyspace, columnParent, slicePredicate, keyRange, 1) returns keySlices
+    converter.toMap(keySlices) returns map
 
     "with all the options specified" in {
       converter.makeColumnParent("Users") returns columnParent
       converter.makeSlicePredicate(false, 10) returns slicePredicate
       converter.makeKeyRange("1") returns keyRange
 
-      cassandra.get("Users", "1", false, 10)
+      val returned = cassandra.get("Users", "1", false, 10)
 
       "converts to thrift data types and queries thrift" in {
         client.get_range_slices(keyspace, columnParent,
           slicePredicate, keyRange, 1) was called
+      }
+
+      "returns the converted map" in {
+        returned must_== map
       }
     }
 
@@ -54,11 +64,15 @@ object CassandraSpec extends Specification with Mockito {
       converter.makeSlicePredicate(false, 100) returns slicePredicate
       converter.makeKeyRange("1") returns keyRange
 
-      cassandra.get("Users", "1")
+      val returned = cassandra.get("Users", "1")
 
       "converts to thrift data types and queries thrift" in {
         client.get_range_slices(keyspace, columnParent,
           slicePredicate, keyRange, 1) was called
+      }
+
+      "returns the converted map" in {
+        returned must_== map
       }
     }
   }
