@@ -20,11 +20,13 @@ import org.specs.mock.Mockito
 import org.mockito.Matchers._
 
 object ConverterSpec extends Specification with Mockito {
+  import TypeConversions._
+
   val converter = new Converter
 
   "converting a batch of mutations to a mutation_map" in {
-    val colMutation   = Mutation("Users", "key", "name", "value", 12345)
-    val superMutation = Mutation("Relations", "1", "super", "uuid", "", 12345)
+    val colMutation   = new Mutation("Users", "key", null, "name", "value", 12345)
+    val superMutation = new Mutation("Relations", "1", "super", "uuid", "", 12345)
     val mutations     = List[Mutation](colMutation, superMutation)
     val batch         = new Batch(mutations)
     val map           = converter.toMutationMap(batch)
