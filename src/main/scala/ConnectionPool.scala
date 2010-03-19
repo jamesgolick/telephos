@@ -8,6 +8,14 @@ class ConnectionPool(connectionFactory: ConnectionFactory,
     this(connectionFactory, new Queue[Cassandra])
   }
 
+  def this(keyspace: String, host: String, port: Int) = {
+    this(new ConnectionFactory(keyspace, host, port), new Queue[Cassandra])
+  }
+
+  def this(keyspace: String, host: String) = {
+    this(keyspace, host, 9160)
+  }
+
   def withConnection[A](f: Cassandra => A): A = {
     val connection = get
     try {
