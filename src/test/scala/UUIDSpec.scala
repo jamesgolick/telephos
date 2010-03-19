@@ -28,4 +28,15 @@ object UUIDSpec extends Specification with Mockito {
     bigUnderlying.toString returns "abcdefg-abc-abc-abcdefg"
     big.toString must_== "abcdefg-abc-abc-abcdefg"
   }
+
+  "it delegates to the underlying uuid for equality" in {
+    big.equals(new UUID(bigUnderlying)) must beTrue
+    big.equals(small) must beFalse
+  }
+
+  "it delegates to the underlying uuid to convert to byte array" in {
+    bigUnderlying.asByteArray returns "abcdefg".getBytes
+
+    big.asByteArray must_== bigUnderlying.asByteArray
+  }
 }
