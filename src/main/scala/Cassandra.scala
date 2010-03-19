@@ -40,8 +40,8 @@ class Cassandra(val keyspace: String,
     client.batch_mutate(keyspace, converter.toMutationMap(batch), 1)
   }
 
-  def get(columnFamily: String, key: String,
-          reversed: Boolean, limit: Int): Map[Array[Byte], Array[Byte]] = {
+  def get(columnFamily: String,  key:   String,
+          reversed:     Boolean, limit: Int): Map[Array[Byte], Array[Byte]] = {
     val parent    = converter.makeColumnParent(columnFamily)
     val predicate = converter.makeSlicePredicate("", "", reversed, limit)
     val keyRange  = converter.makeKeyRange(key)
