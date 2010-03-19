@@ -51,8 +51,15 @@ class Converter {
     }
   }
 
-  def makeColumnParent(columnFamily: String) = {
-    new ColumnParent().tap { c => c.column_family = columnFamily }
+  def makeColumnParent(columnFamily: String): ColumnParent = {
+    makeColumnParent(columnFamily, null)
+  }
+
+  def makeColumnParent(columnFamily:String, superColumn:Array[Byte]): ColumnParent={
+    new ColumnParent().tap { c =>
+      c.column_family = columnFamily
+      c.super_column  = superColumn
+    }
   }
 
   def makeSlicePredicate(reversed: Boolean, count: Int): SlicePredicate = {

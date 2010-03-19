@@ -63,6 +63,19 @@ object ConverterSpec extends Specification with Mockito {
       parent.column_family must_== "Users"
     }
   }
+  
+  "converting a columnFamily and superColumn in to a ColumnParent" in {
+    val superCol = "whatevers".getBytes
+    val parent: ColumnParent = converter.makeColumnParent("Relations", superCol)
+
+    "sets column_family to that cf" in {
+      parent.column_family must_== "Relations"
+    }
+
+    "sets supercolumn to the column" in {
+      parent.super_column must_== superCol
+    }
+  }
 
   "creating a slice predicate with no col range" in {
     val slicePredicate: SlicePredicate = converter.makeSlicePredicate(false, 5)
