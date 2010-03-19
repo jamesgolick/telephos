@@ -33,6 +33,9 @@ object Cassandra {
 class Cassandra(val keyspace: String,
                 client:       TCassandra.Client,
                 converter:    Converter) {
+  def this(keyspace: String, client: TCassandra.Client) = {
+    this(keyspace, client, new Converter)
+  }
 
   import TypeConversions._
 
