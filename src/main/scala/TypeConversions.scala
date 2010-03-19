@@ -1,7 +1,5 @@
 package com.protose.telephos
 
-import org.safehaus.uuid.UUID
-
 object TypeConversions {
   implicit def string2ByteArray(string: String): Array[Byte] = string.getBytes
   implicit def map2ColumnMap[A <% Array[Byte], B <% Array[Byte]](map: Map[A, B]):
@@ -20,6 +18,6 @@ object TypeConversions {
     }
   }
 
-  implicit def uuid2ByteArray(uuid: UUID): Array[Byte] = uuid.asByteArray
-  implicit def byteArray2UUID(bytes: Array[Byte]): UUID = UUID.valueOf(bytes)
+  implicit def uuid2ByteArray(uuid: UUID): Array[Byte]  = uuid.asByteArray
+  implicit def byteArray2UUID(bytes: Array[Byte]): UUID = new UUID(bytes)
 }
