@@ -15,6 +15,8 @@ import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 
 object CassandraSpec extends Specification with Mockito {
+  import TypeConversions._
+  
   val client    = mock[TCassandra.Client]
   val converter = mock[Converter]
   val keyspace  = "ActivityFeed"
@@ -65,6 +67,23 @@ object CassandraSpec extends Specification with Mockito {
       converter.makeKeyRange("1") returns keyRange
 
       val returned = cassandra.get("Users", "1")
+
+      "converts to thrift data types and queries thrift" in {
+        client.get_range_slices(keyspace, columnParent,
+          slicePredicate, keyRange, 1) was called
+      }
+
+      "returns the converted map" in {
+        returned must_== map
+      }
+    }
+
+    "in a specific supercolumn" in {
+      converter.makeColumnParent("UserRelations", "statuses") returns columnParent
+      converter.makeSlicePredicate(false, 100) returns slicePredicate
+      converter.makeKeyRange("1") returns keyRange
+
+      val returned = cassandra.getSuper("UserRelations", "1", "statuses", false, 100)
 
       "converts to thrift data types and queries thrift" in {
         client.get_range_slices(keyspace, columnParent,

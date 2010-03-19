@@ -51,4 +51,14 @@ class Cassandra(val keyspace: String,
   def get(columnFamily: String, key: String): Map[Array[Byte], Array[Byte]] = {
     get(columnFamily, key, false, 100)
   }
+
+  def getSuper(columnFamily: String, key: String, superColumn: Array[Byte],
+          reversed: Boolean, limit: Int): Map[Array[Byte], Array[Byte]] = {
+    val parent    = converter.makeColumnParent(columnFamily, superColumn)
+    val predicate = converter.makeSlicePredicate(reversed, limit)
+    val keyRange  = converter.makeKeyRange(key)
+    val list      = client.get_range_slices(keyspace, parent, predicate, keyRange, 1)
+
+    converter.toMap(list)
+  }
 }
