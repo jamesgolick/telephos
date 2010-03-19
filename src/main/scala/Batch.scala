@@ -5,7 +5,7 @@ class Batch(val mutations: List[Mutation]) {
 
   def insert(columnFamily: String,
              key:          String, 
-             columns:      Map[String, String]): Batch = {
+             columns:      Map[Array[Byte], Array[Byte]]): Batch = {
     new Batch(mutations ++ columns.foldLeft(List[Mutation]()) { (mutations, kv) =>
       Mutation(columnFamily, key, kv._1, kv._2) :: mutations
     })
@@ -13,8 +13,8 @@ class Batch(val mutations: List[Mutation]) {
 
   def insert(columnFamily: String,
              key:          String, 
-             superColumn:  String,
-             columns:      Map[String, String]): Batch = {
+             superColumn:  Array[Byte],
+             columns:      Map[Array[Byte], Array[Byte]]): Batch = {
     new Batch(mutations ++ columns.foldLeft(List[Mutation]()) { (mutations, kv) =>
       Mutation(columnFamily, key, superColumn, kv._1, kv._2) :: mutations
     })

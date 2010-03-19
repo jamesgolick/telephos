@@ -5,6 +5,8 @@ import org.specs.mock.Mockito
 import org.mockito.Matchers._
 
 object BatchSpec extends Specification with Mockito {
+  import TypeConversions._
+
   val batch = new Batch
 
   "inserting in to columns in a batch" in {
