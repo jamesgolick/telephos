@@ -46,7 +46,7 @@ object CassandraSpec extends Specification with Mockito {
 
     "with all the options specified" in {
       converter.makeColumnParent("Users") returns columnParent
-      converter.makeSlicePredicate(false, 10) returns slicePredicate
+      converter.makeSlicePredicate("", "", false, 10) returns slicePredicate
       converter.makeKeyRange("1") returns keyRange
 
       val returned = cassandra.get("Users", "1", false, 10)
@@ -63,7 +63,7 @@ object CassandraSpec extends Specification with Mockito {
 
     "with only the cf and key specified" in {
       converter.makeColumnParent("Users") returns columnParent
-      converter.makeSlicePredicate(false, 100) returns slicePredicate
+      converter.makeSlicePredicate("", "", false, 100) returns slicePredicate
       converter.makeKeyRange("1") returns keyRange
 
       val returned = cassandra.get("Users", "1")
@@ -79,11 +79,13 @@ object CassandraSpec extends Specification with Mockito {
     }
 
     "in a specific supercolumn" in {
+      val start = "start-key".getBytes
       converter.makeColumnParent("UserRelations", "statuses") returns columnParent
-      converter.makeSlicePredicate(false, 100) returns slicePredicate
+      converter.makeSlicePredicate(start, "", false, 100) returns slicePredicate
       converter.makeKeyRange("1") returns keyRange
 
-      val returned = cassandra.getSuper("UserRelations", "1", "statuses", false, 100)
+      val returned = cassandra.getSuper("UserRelations", "1", "statuses",
+                                        start, false, 100)
 
       "converts to thrift data types and queries thrift" in {
         client.get_range_slices(keyspace, columnParent,

@@ -34,6 +34,8 @@ class Cassandra(val keyspace: String,
                 client:       TCassandra.Client,
                 converter:    Converter) {
 
+  import TypeConversions._
+
   def insert(batch: Batch) = {
     client.batch_mutate(keyspace, converter.toMutationMap(batch), 1)
   }
@@ -41,7 +43,7 @@ class Cassandra(val keyspace: String,
   def get(columnFamily: String, key: String,
           reversed: Boolean, limit: Int): Map[Array[Byte], Array[Byte]] = {
     val parent    = converter.makeColumnParent(columnFamily)
-    val predicate = converter.makeSlicePredicate(reversed, limit)
+    val predicate = converter.makeSlicePredicate("", "", reversed, limit)
     val keyRange  = converter.makeKeyRange(key)
     val list      = client.get_range_slices(keyspace, parent, predicate, keyRange, 1)
 
@@ -53,9 +55,10 @@ class Cassandra(val keyspace: String,
   }
 
   def getSuper(columnFamily: String, key: String, superColumn: Array[Byte],
-          reversed: Boolean, limit: Int): Map[Array[Byte], Array[Byte]] = {
+               startKey: Array[Byte], reversed: Boolean, limit: Int):
+                  Map[Array[Byte], Array[Byte]] = {
     val parent    = converter.makeColumnParent(columnFamily, superColumn)
-    val predicate = converter.makeSlicePredicate(reversed, limit)
+    val predicate = converter.makeSlicePredicate(startKey, "", reversed, limit)
     val keyRange  = converter.makeKeyRange(key)
     val list      = client.get_range_slices(keyspace, parent, predicate, keyRange, 1)
 

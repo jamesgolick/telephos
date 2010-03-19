@@ -77,9 +77,11 @@ object ConverterSpec extends Specification with Mockito {
     }
   }
 
-  "creating a slice predicate with no col range" in {
-    val slicePredicate: SlicePredicate = converter.makeSlicePredicate(false, 5)
-    val sliceRange: SliceRange         = slicePredicate.slice_range
+  "creating a slice predicate" in {
+    val slicePredicate: SlicePredicate =
+      converter.makeSlicePredicate("", "", false, 5)
+    val sliceRange: SliceRange         =
+      slicePredicate.slice_range
     
     "has an empty start" in {
       new String(sliceRange.start) must_== ""

@@ -62,9 +62,10 @@ class Converter {
     }
   }
 
-  def makeSlicePredicate(reversed: Boolean, count: Int): SlicePredicate = {
+  def makeSlicePredicate(start:    Array[Byte], finish: Array[Byte],
+                         reversed: Boolean,     count:  Int): SlicePredicate = {
     new SlicePredicate().tap { sp =>
-      sp.slice_range = makeSliceRange("".getBytes, "".getBytes, reversed, count)
+      sp.slice_range = makeSliceRange(start, finish, reversed, count)
     }
   }
 
