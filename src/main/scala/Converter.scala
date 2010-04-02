@@ -51,6 +51,18 @@ class Converter {
     }
   }
 
+  def toMap(results: JMap[String, JList[ColumnOrSuperColumn]]):
+    Map[String, Map[Array[Byte], Array[Byte]]] = {
+      val empty = Map[String, Map[Array[Byte], Array[Byte]]]()
+      results.asScala.foldLeft(empty) { case (map, (k,v)) =>
+        val emptyCols = Map[Array[Byte], Array[Byte]]()
+        val columns   = v.asScala.map(_.column).foldLeft(emptyCols) { (map,column) =>
+          map + (column.name -> column.value)
+        }
+        map + (k -> columns)
+      }
+  }
+
   def makeColumnParent(columnFamily: String): ColumnParent = {
     makeColumnParent(columnFamily, null)
   }

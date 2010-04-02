@@ -1,6 +1,7 @@
 package com.protose.telephos.spec
 
 import java.util.{Map => JMap}
+import java.util.{HashMap => JHashMap}
 import java.util.{List => JList}
 import java.util.{ArrayList => JArrayList}
 
@@ -137,6 +138,34 @@ object ConverterSpec extends Specification with Mockito {
     "converts the structure into a sorted map" in {
       map(name1) must_== value1
       map(name2) must_== value2
+    }
+  }
+
+  "converting multiget results to a scala map" in {
+    val name1   = "name".getBytes
+    val value1  = "value".getBytes
+    val name2   = "name2".getBytes
+    val value2  = "value2".getBytes
+
+    val results = new JHashMap[String, JList[ColumnOrSuperColumn]]
+    val columns = new JArrayList[ColumnOrSuperColumn]().tap { cols =>
+      cols.add(new ColumnOrSuperColumn().tap { cos =>
+        cos setColumn new Column(name1, value1, 12345)
+      })
+
+      cols.add(new ColumnOrSuperColumn().tap { cos =>
+        cos setColumn new Column(name2, value2, 12345)
+      })
+    }
+
+    results.put("1", columns)
+    results.put("2", columns)
+
+    val map = converter.toMap(results)
+
+    "maps key -> name/value map" in {
+      map("1") must_== Map(name1 -> value1, name2 -> value2)
+      map("2") must_== Map(name1 -> value1, name2 -> value2)
     }
   }
 }
