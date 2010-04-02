@@ -8,11 +8,14 @@ import java.util.{Map => JMap}
 import java.util.{List => JList}
 
 import org.apache.cassandra.thrift.{Cassandra => TCassandra}
+import org.apache.cassandra.thrift.ColumnOrSuperColumn
 import org.apache.cassandra.thrift.ColumnParent
 import org.apache.cassandra.thrift.KeyRange
 import org.apache.cassandra.thrift.KeySlice
 import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
+
+import org.scala_tools.javautils.Imports._
 
 object CassandraSpec extends Specification with Mockito {
   import TypeConversions._
@@ -95,6 +98,31 @@ object CassandraSpec extends Specification with Mockito {
       "returns the converted map" in {
         returned must_== map
       }
+    }
+  }
+
+  "multiget" in {
+    val columnParent   = mock[ColumnParent]
+    val slicePredicate = mock[SlicePredicate]
+    val results        = mock[JMap[String, JList[ColumnOrSuperColumn]]]
+    val keys           = List("1", "2")
+    val jKeys          = keys.asJava
+    val converted      = Map[String, Map[Array[Byte], Array[Byte]]]()
+
+    client.multiget_slice("ActivityFeed", jKeys, columnParent, slicePredicate, 1) returns results
+
+    converter.makeColumnParent("Timelines") returns columnParent
+    converter.makeSlicePredicate("", "", false, 100) returns slicePredicate
+    converter.toMap(results) returns converted
+
+    val result         = cassandra.multiget("Timelines", keys)
+
+    "it converts the arguments to thrift compatible ones and queries thrift" in {
+      client.multiget_slice("ActivityFeed", jKeys, columnParent, slicePredicate, 1) was called
+    }
+
+    "it converts the result to sane scala structures and returns them" in {
+      result must_== converted
     }
   }
 }

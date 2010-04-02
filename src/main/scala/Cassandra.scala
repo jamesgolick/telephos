@@ -18,6 +18,8 @@ import org.apache.cassandra.thrift.{Mutation => TMutation}
 import org.apache.cassandra.thrift.SlicePredicate
 import org.apache.cassandra.thrift.SliceRange
 
+import org.scala_tools.javautils.Imports._
+
 object Cassandra {
   def apply(keyspace: String): Cassandra = {
     val socket    = new TSocket("localhost", 9160)
@@ -66,5 +68,14 @@ class Cassandra(val keyspace: String,
     val list      = client.get_range_slices(keyspace, parent, predicate, keyRange, 1)
 
     converter.toMap(list)
+  }
+
+  def multiget(columnFamily: String, keys: List[String]): 
+    Map[String, Map[Array[Byte], Array[Byte]]] = {
+    val parent         = converter.makeColumnParent(columnFamily)
+    val slicePredicate = converter.makeSlicePredicate("", "", false, 100)
+    val result = client.multiget_slice(keyspace, keys.asJava, parent, slicePredicate, 1)
+
+    converter.toMap(result)
   }
 }
