@@ -3,3 +3,5 @@ lib_managed/
 src_managed/
 project/boot/
 dist
+src/main/scala/Benchmarks.scala
+times.log
