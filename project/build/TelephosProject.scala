@@ -22,4 +22,34 @@ class TelephosProject(info: ProjectInfo) extends DefaultProject(info) {
   lazy val thriftJava = thriftTask("java", javaDirectoryPath, thriftFile) describedAs("Build Thift Java")
 
   override def compileAction = super.compileAction dependsOn(thriftJava)
+
+  lazy val benchmark = task { args =>
+    runTask(Some("com.protose.telephos.benchmarks"), runClasspath, args) dependsOn(compile, copyResources)
+  } describedAs("Run the benchmarks.")
+
+  val distName = "telephos.zip"
+
+  def distPath = (
+    // NOTE the double hashes (##) hoist the files in the preceeding directory
+    // to the top level - putting them in the "base directory" in sbt's terminology
+    ((outputPath ##) / defaultJarName) +++
+    mainResources +++
+    mainDependencies.scalaJars +++
+    descendents(info.projectPath, "*.sh") +++
+    descendents(info.projectPath, "*.rb") +++
+    descendents(info.projectPath, "*.conf") +++
+    descendents(info.projectPath / "lib" ##, "*.jar") +++
+    descendents(managedDependencyRootPath / "compile" ##, "*.jar")
+  )
+
+  override def manifestClassPath = Some(
+    distPath.getFiles
+    .filter(_.getName.endsWith(".jar"))
+    .map(_.getName).mkString(" ")
+  )
+
+  override def mainClass = Some("com.protose.telephos.benchmarks")
+  override lazy val `package` = packageAction
+
+  lazy val zip = zipTask(distPath, "dist", distName) dependsOn (`package`) describedAs("Zips up the project.")
 }
