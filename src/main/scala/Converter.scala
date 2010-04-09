@@ -43,11 +43,14 @@ class Converter {
   }
 
   def toMap(keySlices: JList[KeySlice]): Map[Array[Byte], Array[Byte]] = {
-    val columns = keySlices.get(0).getColumns.asScala
-    columns.foldLeft(Map[Array[Byte], Array[Byte]]()) { (map, colOrSuper) =>
-      val col = colOrSuper.column
-
-      map + (col.name -> col.value)
+    if (keySlices isEmpty) {
+      Map[Array[Byte], Array[Byte]]()
+    } else {
+      val columns = keySlices.get(0).getColumns.asScala
+      columns.foldLeft(Map[Array[Byte], Array[Byte]]()) { (map, colOrSuper) =>
+        val col = colOrSuper.column
+        map + (col.name -> col.value)
+      }
     }
   }
 

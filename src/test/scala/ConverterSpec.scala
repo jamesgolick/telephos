@@ -114,30 +114,40 @@ object ConverterSpec extends Specification with Mockito {
   }
 
   "converting a java list of keyslices in to a sorted map of columns" in {
-    val name1   = "name".getBytes
-    val value1  = "value".getBytes
-    val name2   = "name2".getBytes
-    val value2  = "value2".getBytes
+    "when some keyslices are returned" in {
+      val name1   = "name".getBytes
+      val value1  = "value".getBytes
+      val name2   = "name2".getBytes
+      val value2  = "value2".getBytes
 
-    val columns  = new JArrayList[ColumnOrSuperColumn]().tap { cols =>
-      cols.add(new ColumnOrSuperColumn().tap { cos =>
-        cos setColumn new Column(name1, value1, 12345)
-      })
+      val columns  = new JArrayList[ColumnOrSuperColumn]().tap { cols =>
+        cols.add(new ColumnOrSuperColumn().tap { cos =>
+          cos setColumn new Column(name1, value1, 12345)
+        })
 
-      cols.add(new ColumnOrSuperColumn().tap { cos =>
-        cos setColumn new Column(name2, value2, 12345)
-      })
+        cols.add(new ColumnOrSuperColumn().tap { cos =>
+          cos setColumn new Column(name2, value2, 12345)
+        })
+      }
+      val keySlice = mock[KeySlice]
+      val slices   = new JArrayList[KeySlice]().tap { l => l.add(keySlice) }
+
+      keySlice.getColumns returns columns
+
+      val map = converter.toMap(slices)
+
+      "converts the structure into a sorted map" in {
+        map(name1) must_== value1
+        map(name2) must_== value2
+      }
     }
-    val keySlice = mock[KeySlice]
-    val slices   = new JArrayList[KeySlice]().tap { l => l.add(keySlice) }
 
-    keySlice.getColumns returns columns
+    "when no keyslices are returned" in {
+      val emptyMap = new JArrayList[KeySlice]()
 
-    val map = converter.toMap(slices)
-
-    "converts the structure into a sorted map" in {
-      map(name1) must_== value1
-      map(name2) must_== value2
+      "it returns an empty map" in {
+        converter.toMap(emptyMap) must_== Map[Array[Byte], Array[Byte]]()
+      }
     }
   }
 
