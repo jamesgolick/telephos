@@ -3,6 +3,7 @@ package com.protose.telephos
 import org.safehaus.uuid.{UUID => UnderlyingUUID}
 import org.safehaus.uuid.UUIDGenerator
 
+@serializable
 class UUID(protected val underlying: UnderlyingUUID) extends Ordered[UUID] {
   def this() = this(UUIDGenerator.getInstance.generateTimeBasedUUID)
 
